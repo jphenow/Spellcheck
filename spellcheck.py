@@ -1,12 +1,15 @@
 #!/usr/bin/python
-# spellcheck.py
+# Filename: spellcheck.py
 
 import re
 import collections
 import string
+import sys
 from itertools import groupby
+import timeit
 
 attempted = []
+exclude = set(string.punctuation)
 
 def splitter( word ):
 	splits = []
@@ -57,7 +60,9 @@ def find_duplicates( string ):
 	allowed = ('aeioupt')
 	return record_duplicates('', sequence, allowed=allowed)
 
-def words_only( text ): return re.findall( '[a-z]{2,}', text.lower( )) 
+def words_only( text ):
+	no_punctuation = ''.join( ch for ch in text if ch not in exclude )
+	return re.findall( '[a-z]{1,}', no_punctuation.lower( ) )
 
 def prep( features ):
 	model = collections.defaultdict( lambda: 1 )
@@ -65,20 +70,46 @@ def prep( features ):
 		model[f] += 1
 	return model
 
-def spellcheck(word):
+def spellcheck( word ):
 	word = word.lower()
+	word = ''.join(ch for ch in word if ch not in exclude)
+	english_only = words_only( word )
+	if not english_only:
+		return "NO SUGGESTION: English letters only"
+	if word in dictionary:
+		return word
 	words = find_duplicates( word )
-	candidates = known(words) or edits( words ) or edits( attempted ) or edits( attempted.reverse() )
+	candidates = known(words) or edits( words ) or edits( attempted ) 
 	if candidates:
 		max_return = candidates[0] #max(candidates, key=lambda w: dictionary[w])
+		del attempted[:]
 		return max_return
 	else:
+		del attempted[:]
 		return "NO SUGGESTION"
 
-dictionary = prep( words_only( file( '/usr/share/dict/words' ).read( ) ) )
+dictionary = set( prep( words_only( file( '/usr/share/dict/words' ).read( ) ) ) )
 
-while 1 == 1: 
-	word = raw_input( '> ' )
-	print spellcheck( word )
-	attempted = []
+if sys.stdin.isatty():
+	print """
+	Welcome to the Spell Checker!
+	This spell checker currently checks for:
+	* A-Z english words
+	* capitalization errors
+	* duplicate letters
+	* misspelled vowels
 
+	It currently picks the first close-spelling word for speed
+	"""
+	while 1 == 1: 
+		word = raw_input( '> ' )
+		print spellcheck( word )
+else:
+	message = sys.stdin.read().split( ' ' )
+	print "Running batch using:\n", ', '.join( message )
+	for word in message:
+		word = word.replace( '\n', '' )
+		print spellcheck( word )
+
+time = timeit.Timer('f("CUNsperrICY")', 'from __main__ import spellcheck as f').timeit(5)/5
+print "AVG time for CUNsperrICY: " + str( time )
