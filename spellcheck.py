@@ -62,7 +62,7 @@ def find_duplicates( string ):
 
 def words_only( text ):
 	no_punctuation = ''.join( ch for ch in text if ch not in exclude )
-	return re.findall( '[a-z]{1,}', no_punctuation.lower( ) )
+	return set( re.findall( '[a-z]{1,}', no_punctuation.lower( ) ) )
 
 def prep( features ):
 	model = collections.defaultdict( lambda: 1 )
@@ -71,8 +71,8 @@ def prep( features ):
 	return model
 
 def spellcheck( word ):
+	print word
 	word = word.lower()
-	word = ''.join(ch for ch in word if ch not in exclude)
 	english_only = words_only( word )
 	if not english_only:
 		return "NO SUGGESTION: English letters only"
@@ -82,10 +82,8 @@ def spellcheck( word ):
 	candidates = known(words) or edits( words ) or edits( attempted ) 
 	if candidates:
 		max_return = candidates[0] #max(candidates, key=lambda w: dictionary[w])
-		del attempted[:]
 		return max_return
 	else:
-		del attempted[:]
 		return "NO SUGGESTION"
 
 dictionary = set( prep( words_only( file( '/usr/share/dict/words' ).read( ) ) ) )
@@ -110,6 +108,3 @@ else:
 	for word in message:
 		word = word.replace( '\n', '' )
 		print spellcheck( word )
-
-time = timeit.Timer('f("CUNsperrICY")', 'from __main__ import spellcheck as f').timeit(5)/5
-print "AVG time for CUNsperrICY: " + str( time )

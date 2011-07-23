@@ -7,6 +7,8 @@ import re
 import string
 from itertools import groupby
 
+dictionary = set( re.findall( '.{2,}', file( '/usr/share/dict/words' ).read( ) ) )
+
 def splitter( word ):
 	splits = []
 	for i in range( len( word ) + 1 ):
@@ -32,22 +34,23 @@ def known( words ):
 def record_duplicates( previous, sequence, allowed='aeiou' ):
 	if not sequence:
 		return [previous]
-	solutions = record_duplicates(previous + sequence[0][0], sequence[1:], allowed=allowed)
-	if sequence[0][0] in allowed and sequence[0][1]:
-		solutions += record_duplicates(previous + sequence[0][0] * 2, sequence[1:], allowed=allowed)
+	solutions = []
+	for i in range( 2, 4 ): # 7 is arbitrary, just something to show duplicated letters
+		if sequence[0][0] in allowed and sequence[0][1]:
+			solutions += record_duplicates( previous + sequence[0][0] * i, sequence[1:], allowed=allowed )
 	return solutions
 
-def find_duplicates( string ):
-	group = groupby( string )
-	sequence = [(k, len(list(g)) >= 7) for k, g in group]
-	allowed = ('aeioupt')
-	return record_duplicates('', sequence, allowed=allowed)
+def find_duplicates( word ):
+	group = groupby( word )
+	sequence = [( k, len( list( g ) ) <= 7 ) for k, g in group]
+	allowed = string.lowercase
+	return record_duplicates( '', sequence, allowed=allowed )
 
 def make_caps( splits ):
 	caps = []
 	for a, b in splits:
 		b = b.upper()
-		caps.append( b )
+		caps.append( a + b )
 	return caps
 
 def edits( word ):
@@ -58,27 +61,28 @@ def edits( word ):
 	return set( duplicates + replaces + caps )
 
 def generate( per = 10 ):
-	generates = []
-	generates_return = []
-	dictionary = file( '/usr/share/dict/words' ).readlines( )
-	random_dict = random.randint( 0, len( dictionary ) )
-	for i in range( 0, per ):
-		generates.append( dictionary[random_dict] )
-		for j in range( 0, per ):
-			generates += edits( generates[j] )
-		random_return = random.randint( 0, len( generates )-1 )
-		generates_return.append( generates[random_return] )
+	generates = set()
+	generates_return = set()
+	random_dict = random.randrange( len( dictionary ) )
+	while len( generates ) < per:
+		word = random.sample( dictionary, 1 )[0]
+		dictionary.add( word )
+		if word not in generates:
+			generates.add( word )
+		for i in range( 0, 3 ): # Should consider making a param
+			# Not the most efficient, but reusing word variable can cause overuse of word for edits for parameters of over 10
+			random_edits = random.sample( edits( random.sample( dictionary, 1 )[0] ), 1 )[0] 
+			if random_edits not in generates:
+				generates.add( random_edits )
 	exclude = set( string.punctuation )
-	stringify = ' '.join( generates_return )
+	stringify = ' '.join( generates )
 	stringify = ''.join(ch for ch in stringify if ch not in exclude)
 	return stringify.replace( '\n ', ' ' )
 
 if len( sys.argv ) > 1:
 	if len( sys.argv ) > 2:
-		print "Only using the first parameter"
-
+		print "Only using the first parameter... "
 	message = int( sys.argv[1] )
 	print generate( per=message )
 else:
 	print generate( )
-
