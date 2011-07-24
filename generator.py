@@ -19,9 +19,10 @@ def replacer( splits ):
 	vowel= "aeiou"
 	replaces = []
 	for a, b in splits:
-		for c in vowel:
-			if b:
-				replaces.append( a + c + b[1:] )
+		if len(b) > 0 and b[0] in vowel:
+			for c in vowel:
+				if b:
+					replaces.append( a + c + b[1:] )
 	return replaces
 
 def known( words ):
@@ -77,12 +78,12 @@ def generate( per = 10 ):
 	exclude = set( string.punctuation )
 	stringify = ' '.join( generates )
 	stringify = ''.join(ch for ch in stringify if ch not in exclude)
-	return stringify.replace( '\n ', ' ' )
+	return stringify.replace( '\n ', ' ' ).replace( ' ', '\n' )
 
 if len( sys.argv ) > 1:
-	if len( sys.argv ) > 2:
-		print "Only using the first parameter... "
 	message = int( sys.argv[1] )
-	print generate( per=message )
+	sys.stdout.write( generate( per=message ) )
+	print
 else:
-	print generate( )
+	sys.stdout.write( ( generate( ) ) )
+	print

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # Filename: spellcheck.py
+# Author: Jon Phenow
 
 import re
 import collections
@@ -9,7 +10,7 @@ from itertools import groupby
 import timeit
 
 attempted = []
-exclude = set(string.punctuation)
+exclude = set( string.punctuation )
 
 def splitter( word ):
 	splits = []
@@ -21,8 +22,8 @@ def replacer( splits ):
 	vowel= "aeiou"
 	replaces = []
 	for a, b in splits:
-		for c in vowel:
-			if b:
+		if len(b) > 0 and b[0] in vowel:
+			for c in vowel:
 				replaces.append( a + c + b[1:] )
 	return replaces
 
@@ -57,36 +58,27 @@ def record_duplicates( previous, sequence, allowed='aeiou' ):
 def find_duplicates( string ):
 	group = groupby( string )
 	sequence = [(k, len(list(g)) >= 2) for k, g in group]
-	allowed = ('aeioupt')
+	allowed = set('aeioptslmfrcgktnbdzhu') 	# Sort of ordered in hopes that earlier 
+											# letters occur more often, and some letters don't repeat
 	return record_duplicates('', sequence, allowed=allowed)
 
 def words_only( text ):
 	no_punctuation = ''.join( ch for ch in text if ch not in exclude )
 	return set( re.findall( '[a-z]{1,}', no_punctuation.lower( ) ) )
 
-def prep( features ):
-	model = collections.defaultdict( lambda: 1 )
-	for f in features:
-		model[f] += 1
-	return model
-
 def spellcheck( word ):
-	print word
 	word = word.lower()
-	english_only = words_only( word )
-	if not english_only:
-		return "NO SUGGESTION: English letters only"
+	word = words_only( word ).pop()
 	if word in dictionary:
 		return word
 	words = find_duplicates( word )
-	candidates = known(words) or edits( words ) or edits( attempted ) 
+	candidates = known( words ) or edits( words ) or edits( attempted ) 
 	if candidates:
-		max_return = candidates[0] #max(candidates, key=lambda w: dictionary[w])
-		return max_return
+		return candidates[0]
 	else:
 		return "NO SUGGESTION"
 
-dictionary = set( prep( words_only( file( '/usr/share/dict/words' ).read( ) ) ) )
+dictionary = set( words_only( file( '/usr/share/dict/words' ).read( ) ) )
 
 if sys.stdin.isatty():
 	print """
@@ -97,14 +89,19 @@ if sys.stdin.isatty():
 	* duplicate letters
 	* misspelled vowels
 
-	It currently picks the first close-spelling word for speed
+	- It currently picks the first close-spelling
+		word for speed
+	- Punctuation and non A-Z characters are omitted
 	"""
 	while 1 == 1: 
 		word = raw_input( '> ' )
 		print spellcheck( word )
+		del attempted[:]
 else:
-	message = sys.stdin.read().split( ' ' )
-	print "Running batch using:\n", ', '.join( message )
+	message = set( sys.stdin.readlines( ) )
 	for word in message:
-		word = word.replace( '\n', '' )
-		print spellcheck( word )
+		word = word.replace( '\n', '' ).strip( )
+		sys.stdout.write( "Checking '" + word + "': " )
+		sys.stdout.flush()
+		sys.stdout.write( spellcheck( word ) + '\n' )
+		del attempted[:]
