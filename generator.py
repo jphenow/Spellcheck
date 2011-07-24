@@ -1,58 +1,23 @@
 #!/usr/bin/python
 # Filename: generator.py
+# Author: Jon Phenow <j.phenow@gmail.com>
+# Description: A relatively slow misspelled word generator
 
 import sys
 import random
 import re
 import string
 from itertools import groupby
+from lib import *
 
+# Using a less nice dictionary - we don't want to cut out the 'hard' stuff for the spellcheck
 dictionary = set( re.findall( '.{2,}', file( '/usr/share/dict/words' ).read( ) ) )
-
-def splitter( word ):
-	splits = []
-	for i in range( len( word ) + 1 ):
-		splits.append( ( word[:i], word[i:] ) )
-	return splits
-
-def replacer( splits ):
-	vowel= "aeiou"
-	replaces = []
-	for a, b in splits:
-		if len(b) > 0 and b[0] in vowel:
-			for c in vowel:
-				if b:
-					replaces.append( a + c + b[1:] )
-	return replaces
-
-def known( words ):
-	for word in words:
-		if word in dictionary:
-			return [word]
-		elif word not in attempted:
-			attempted.append( word )
-
-def record_duplicates( previous, sequence, allowed='aeiou' ):
-	if not sequence:
-		return [previous]
-	solutions = []
-	for i in range( 2, 4 ): # 7 is arbitrary, just something to show duplicated letters
-		if sequence[0][0] in allowed and sequence[0][1]:
-			solutions += record_duplicates( previous + sequence[0][0] * i, sequence[1:], allowed=allowed )
-	return solutions
 
 def find_duplicates( word ):
 	group = groupby( word )
 	sequence = [( k, len( list( g ) ) <= 7 ) for k, g in group]
-	allowed = string.lowercase
-	return record_duplicates( '', sequence, allowed=allowed )
-
-def make_caps( splits ):
-	caps = []
-	for a, b in splits:
-		b = b.upper()
-		caps.append( a + b )
-	return caps
+	allowed = string.letters
+	return record_duplicates( '', sequence, range( 2, 3 ), allowed=allowed )
 
 def edits( word ):
 	splits = splitter( word )
