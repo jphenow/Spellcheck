@@ -20,7 +20,7 @@ Pipe:
 
 or
 
-    ./generator | ./spellchecker.py
+    ./generator.py | ./spellchecker.py
 
 ### Generator
 	
