@@ -41,12 +41,10 @@ def generate( per = 10 ):
 		words = random.sample( dictionary, 10 )
 		for i in range( 0, 3 ): 		# Number of edit revisions for skrewing with words
 			random_edits = random.sample( edits( random.sample( words, 1 )[0] ), 1 )[0]
-			dups = find_duplicates( random_edits )
-			if i % 2 == 0 or ( not dups and i % 2 != 0 ):
-				generates.add( random_edits )
-			else:
-				generates.add( random.sample( dups, 1 )[0] )
-					
+			for a, b in splitter( random_edits ):
+				if len( a ) <= len( a + b ) / 2 and len( a ) >= len( a + b ) / 2 - 2:
+					dups = find_duplicates( a )
+					generates.add( dups[len( dups ) / 2] + b )
 	exclude = set( string.punctuation )
 	stringify = ' '.join( generates )
 	stringify = ''.join( char for char in stringify if char not in exclude )
