@@ -32,8 +32,10 @@ or
 	
 Author: Jon Phenow <j.phenow@gmail.com>
 Quickly achieves a spellcheck for any errors of the following:
-* Mis-capitalized
-* Repeated letters
-* Incorrect vowels
+
+- Mis-capitalized
+- Repeated letters
+- Incorrect vowels
+
 Currently set to utilze the Unix /usr/share/dict/words for a dictionary
 
