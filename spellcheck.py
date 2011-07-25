@@ -7,6 +7,7 @@
         * Mis-capitalized
         * Repeated letters
         * Incorrect vowels
+
     Currently set to utilze the Unix /usr/share/dict/words for a dictionary
     Simply run "python spellcheck.py" or "./spellcheck.py" for a prompt-based check
     or use a command line pipe such as "echo misspelled.txt | ./spellcheck.py"
