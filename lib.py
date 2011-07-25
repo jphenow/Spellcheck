@@ -8,7 +8,6 @@ import re
 import string
 
 global dictionary
-dictionary = set( words_only( file( '/usr/share/dict/words' ).read( ) ) )
 
 """Slice the word at each char so we have a cursor for working edits"""
 def splitter( word ):
@@ -84,4 +83,4 @@ def set_dictionary( new_dictionary ):
     global dictionary
     dictionary = new_dictionary
 
-
+dictionary = set( words_only( file( '/usr/share/dict/words' ).read( ) ) )
