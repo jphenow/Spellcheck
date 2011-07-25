@@ -7,30 +7,43 @@ Relatively simple spellchecker packed with a super mini library of tools, a miss
 ### Spellchecker
 	
 The prompt:
+
     ./spellchecker.py
+
 or
+
     python spellchecker.py
 
 Pipe:
+
     cat standard_words | ./spellchecker.py
+
 or
+
     ./generator | ./spellchecker.py
 
 ### Generator
 	
 Standard 10 word output:
+
     ./generator.py
+
 or
+
     python generator.py
 
 May use a parameter for more words:
+
     ./generator.py 100
+
 or
+
     python generator.py 100
 
 ## General info
 	
 Author: Jon Phenow <j.phenow@gmail.com>
+
 Quickly achieves a spellcheck for any errors of the following:
 
 - Mis-capitalized
