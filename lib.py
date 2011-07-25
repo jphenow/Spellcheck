@@ -7,6 +7,9 @@
 import re
 import string
 
+global dictionary
+dictionary = set( words_only( file( '/usr/share/dict/words' ).read( ) ) )
+
 """Slice the word at each char so we have a cursor for working edits"""
 def splitter( word ):
     splits = []
@@ -76,4 +79,9 @@ def make_caps( splits ):
 def get_dictionary( ):
     return dictionary
 
-dictionary = set( words_only( file( '/usr/share/dict/words' ).read( ) ) )
+"""Set the dictionary used in the lib at runtime"""
+def set_dictionary( new_dictionary ):
+    global dictionary
+    dictionary = new_dictionary
+
+
