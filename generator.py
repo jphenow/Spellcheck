@@ -12,7 +12,7 @@ from itertools import groupby
 from lib import *
 
 # Using a less nice dictionary - we don't want to cut out the 'hard' stuff for the spellcheck
-dictionary = set( re.findall( '.{2,}', file( '/usr/share/dict/words' ).read( ) ) )
+set_dictionary( set( re.findall( '.{2,}', file( '/usr/share/dict/words' ).read( ) ) ) )
 
 """Prepare an input word to be given random duplicate letters"""
 def find_duplicates( word ):
@@ -36,9 +36,9 @@ per = number of random words to grab
 def generate( per = 10 ):
     generates = set()
     generates_return = set()
-    random_dict = random.randrange( len( dictionary ) )
+    random_dict = random.randrange( len( get_dictionary( ) ) )
     while len( generates ) < per:
-        words = random.sample( dictionary, 10 )
+        words = random.sample( get_dictionary( ), 10 )
         for i in range( 0, 3 ):         # Number of edit revisions for skrewing with words
             random_edits = random.sample( edits( random.sample( words, 1 )[0] ), 1 )[0]
             for a, b in splitter( random_edits ):
