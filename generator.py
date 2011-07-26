@@ -44,7 +44,10 @@ def generate( per = 10 ):
             for a, b in splitter( random_edits ):
                 if len( a ) <= len( a + b ) / 2 and len( a ) >= len( a + b ) / 2 - 2:
                     dups = find_duplicates( a )
-                    generates.add( dups[len( dups ) / 2] + b )
+                    try:
+                        generates.add( dups[len( dups ) / 2] + b )
+                    except IndexError:
+                        generates.add( a + b )
     exclude = set( string.punctuation )
     stringify = ' '.join( generates )
     stringify = ''.join( char for char in stringify if char not in exclude )
