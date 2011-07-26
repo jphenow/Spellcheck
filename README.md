@@ -52,3 +52,7 @@ Quickly achieves a spellcheck for any errors of the following:
 
 Currently set to utilze the Unix /usr/share/dict/words for a dictionary
 
+## Further work
+
+- Optimize the check for duplicated letters - Currently giving it a word with all letters over duplicated will clog the spellcheck - give it too many options to try. 
+- Universalize a little - find a way to handle more types of common spelling errors rather than doing the kitchen sink as is done [here](http://norvig.com/spell-correct.html) 
